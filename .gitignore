@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Docker
+.dockerignore
+
+# IDEs
+.vscode/
+.idea/
