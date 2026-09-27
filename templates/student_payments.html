@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block header %}My Payments{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+
+    <!-- Payable Fines (Returned Books) -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-red-50 flex justify-between items-center">
+            <h3 class="font-bold text-red-800">Pending Fines (Payable)</h3>
+            <span class="text-xs bg-red-200 text-red-800 px-2 py-1 rounded-full">Action Required</span>
+        </div>
+
+        {% if payable %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500">
+                        <th class="px-6 py-4 font-semibold">Book</th>
+                        <th class="px-6 py-4 font-semibold">Returned Date</th>
+                        <th class="px-6 py-4 font-semibold">Amount</th>
+                        <th class="px-6 py-4 font-semibold text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-sm">
+                    {% for t in payable %}
+                    <tr>
+                        <td class="px-6 py-4 font-medium">{{ t.book.title }}</td>
+                        <td class="px-6 py-4">{{ t.return_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="px-6 py-4 font-bold text-red-600">₹{{ t.penalty }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <form method="POST">
+                                <input type="hidden" name="transaction_id" value="{{ t.id }}">
+                                <button type="submit"
+                                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded shadow transition-colors">
+                                    Pay Now
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-slate-500">
+            <i class="fas fa-check-circle text-4xl text-green-400 mb-2"></i>
+            <p>You have no pending payable fines.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Estimated Fines (Active Loans) -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-orange-50">
+            <h3 class="font-bold text-orange-800">Estimated Fines (Active Loans)</h3>
+        </div>
+        {% if estimated %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500">
+                        <th class="px-6 py-4 font-semibold">Book</th>
+                        <th class="px-6 py-4 font-semibold">Due Date</th>
+                        <th class="px-6 py-4 font-semibold">Current Fine</th>
+                        <th class="px-6 py-4 font-semibold text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-sm">
+                    {% for t in estimated %}
+                    <tr>
+                        <td class="px-6 py-4 font-medium">{{ t.book.title }}</td>
+                        <td class="px-6 py-4 text-red-600">{{ t.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td class="px-6 py-4 font-bold text-orange-600">₹{{ t.penalty }} (Increasing)</td>
+                        <td class="px-6 py-4 text-right text-slate-500 italic">
+                            Return book to finalize
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-6 text-center text-slate-500">
+            <p>No active overdue loans.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

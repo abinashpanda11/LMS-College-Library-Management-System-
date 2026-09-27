@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb', // blue-600
+                        secondary: '#1e293b', // slate-800
+                        background: '#f8fafc', // gray-50
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-slate-800 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    {% if current_user.is_authenticated %}
+    <aside class="w-64 bg-slate-800 text-white flex flex-col shadow-xl transition-all duration-300">
+        <div class="h-16 flex items-center justify-center border-b border-slate-700">
+            <h1 class="text-2xl font-bold tracking-wider"><i class="fas fa-book-reader mr-2"></i>LMS</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-2 px-2">
+                {% if current_user.role == 'admin' %}
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'admin_dashboard' }}">
+                        <i class="fas fa-tachometer-alt w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('manage_books') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'manage_books' }}">
+                        <i class="fas fa-book w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Books Inventory</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_users') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'admin_users' }}">
+                        <i class="fas fa-users-cog w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Account Logs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('student_search') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'student_search' }}">
+                        <i class="fas fa-search-plus w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Student Search</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_payments') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'admin_payments' }}">
+                        <i class="fas fa-receipt w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Payment Records</span>
+                    </a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{{ url_for('student_dashboard') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'student_dashboard' }}">
+                        <i class="fas fa-columns w-6 text-center"></i>
+                        <span class="ml-3 font-medium">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('student_payments') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'student_payments' }}">
+                        <i class="fas fa-wallet w-6 text-center"></i>
+                        <span class="ml-3 font-medium">My Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('student_history') }}"
+                        class="flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors {{ 'bg-blue-600 shadow-md' if request.endpoint == 'student_history' }}">
+                        <i class="fas fa-history w-6 text-center"></i>
+                        <span class="ml-3 font-medium">My Loans</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700">
+            <a href="{{ url_for('logout') }}"
+                class="flex items-center p-2 text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-sign-out-alt w-6 text-center"></i>
+                <span class="ml-3">Logout</span>
+            </a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Top Navbar -->
+        {% if current_user.is_authenticated %}
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
+            <div class="text-xl font-semibold text-slate-700">
+                {% block header %}{% endblock %}
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    {% if current_user.photo_filename %}
+                        {% if current_user.photo_filename.startswith('http') %}
+                        <img src="{{ current_user.photo_filename }}" alt="Profile"
+                            class="w-8 h-8 rounded-full object-cover border border-blue-200">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.photo_filename) }}" alt="Profile"
+                            class="w-8 h-8 rounded-full object-cover border border-blue-200">
+                        {% endif %}
+                    {% else %}
+                    <div
+                        class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                        {{ current_user.username[0].upper() }}
+                    </div>
+                    {% endif %}
+                    <span class="text-sm font-medium text-slate-600">{{ current_user.username }} ({{
+                        current_user.role|capitalize }})</span>
+                </div>
+            </div>
+        </header>
+        {% endif %}
+
+        <!-- Flash Messages -->
+        <div class="absolute top-20 right-6 z-50 w-80">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div
+                class="mb-4 p-4 rounded-lg shadow-lg text-white animate-fade-in-down {{ 'bg-green-500' if category == 'success' else 'bg-red-500' if category == 'error' else 'bg-blue-500' }}">
+                <div class="flex items-center justify-between">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Content Body -->
+        <div class="flex-1 overflow-auto {{ 'p-6 bg-gray-50' if current_user.is_authenticated else '' }}">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <style>
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Intl Tel Input Resources (Injected for Auth Page) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
+<style>
+    .iti {
+        width: 100%;
+    }
+
+    /* Fix z-index for dropdown if needed */
+    .iti__country-list {
+        z-index: 100 !important;
+    }
+</style>
+
+<div class="h-screen w-full flex items-center justify-center bg-slate-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex overflow-hidden h-auto max-h-[90vh]">
+
+        <!-- Left Side - Image -->
+        <div class="hidden md:block w-1/2 bg-cover bg-center relative"
+            style="background-image: url('https://images.unsplash.com/photo-1507842217121-9e9628d0526f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+            <div class="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]"></div>
+            <div class="absolute bottom-10 left-10 text-white p-6 z-10">
+                <h2 class="text-3xl font-bold mb-2">Library System</h2>
+                <p class="text-blue-100">Manage your knowledge efficiently.</p>
+            </div>
+        </div>
+
+        <!-- Right Side - Forms -->
+        <div class="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto bg-white flex flex-col justify-center">
+            <div class="text-center mb-6">
+                <!-- Mobile Header -->
+                <h1 class="text-2xl font-bold text-slate-800 md:hidden mb-1">Library System</h1>
+                <!-- Desktop Header -->
+                <h2 class="text-xl font-bold text-slate-700 flex items-center justify-center gap-2">
+                    {{ 'Welcome Back' if mode == 'login' else 'Create Account' }}
+                    <i class="fas fa-hand-sparkles text-amber-400 animate-pulse"></i>
+                </h2>
+                <p class="text-slate-500 text-sm mt-1">{{ 'Sign in to access your dashboard' if mode == 'login' else
+                    'Join our community today' }}</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('login' if mode == 'login' else 'register') }}" class="space-y-3"
+                enctype="multipart/form-data">
+                {% if mode == 'register' %}
+                <div class="grid grid-cols-12 gap-3">
+                    <!-- Row 1: Name & Email -->
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Full Name <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="full_name" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                            placeholder="John Doe">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Email <span
+                                class="text-red-500">*</span></label>
+                        <input type="email" name="email" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                            placeholder="john@example.com">
+                    </div>
+
+                    <!-- Row 2: Mobile & Reg No -->
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Mobile <span
+                                class="text-red-500">*</span></label>
+                        <input type="tel" id="mobile_number" name="mobile_number" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs h-8">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Reg. No <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="reg_no" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                            placeholder="12345">
+                    </div>
+
+                    <!-- Row 3: DOB, Section, Sem -->
+                    <div class="col-span-4">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">DOB <span
+                                class="text-red-500">*</span></label>
+                        <input type="date" name="dob" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Section <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="section" required pattern="[0-9][A-Z][0-9]" title="e.g., 2J3"
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                            placeholder="2J3">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Sem <span
+                                class="text-red-500">*</span></label>
+                        <input type="number" name="semester" min="1" max="8" required
+                            class="block w-full px-2 py-1.5 border rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                            placeholder="1-8">
+                    </div>
+
+                    <!-- Row 4: Photo & Username -->
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Photo <span
+                                class="text-red-500">*</span></label>
+                        <input type="file" name="photo" accept=".jpg, .jpeg, .png" required
+                            class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Username <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-slate-400 text-xs"></i>
+                            </div>
+                            <input type="text" name="username" required
+                                class="block w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                                placeholder="Username">
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Password & Button -->
+                    <div class="col-span-6">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Password <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-slate-400 text-xs"></i>
+                            </div>
+                            <input type="password" name="password" id="password" required
+                                class="block w-full pl-7 pr-8 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 outline-none text-xs"
+                                placeholder="••••••">
+                            <button type="button" onclick="togglePassword()"
+                                class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                                <i class="fas fa-eye text-xs" id="password-toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-span-6 flex items-end">
+                        <button type="submit"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 rounded shadow-sm hover:shadow text-xs transition-colors h-[34px]">
+                            Register
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Login Form -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-slate-400 text-xs"></i>
+                        </div>
+                        <input type="text" name="username" required
+                            class="block w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="Enter username">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-slate-400 text-xs"></i>
+                        </div>
+                        <input type="password" name="password" id="password" required
+                            class="block w-full pl-9 pr-10 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="••••••••">
+                        <button type="button" onclick="togglePassword()"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                            <i class="fas fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <a href="{{ url_for('forgot_password') }}"
+                        class="text-xs text-blue-600 hover:text-blue-800 font-medium">Forgot Password?</a>
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all text-sm mt-4">
+                    Sign In
+                </button>
+                {% endif %}
+            </form>
+
+            <div class="mt-4 text-center">
+                <p class="text-xs text-slate-600">
+                    {{ "Don't have an account?" if mode == 'login' else "Already have an account?" }}
+                    <a href="{{ url_for('register' if mode == 'login' else 'login') }}"
+                        class="text-blue-600 hover:text-blue-800 font-bold ml-1 transition-colors">
+                        {{ 'Register here' if mode == 'login' else 'Login here' }}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('password-toggle-icon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    function toggleForms() {
+        // Toggle logic if needed (currently separate pages or handled by jinja mode)
+    }
+
+    // Initialize Intl Tel Input
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.querySelector("#mobile_number");
+        if (input) {
+            window.intlTelInput(input, {
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
+                initialCountry: "in",
+                separateDialCode: true,
+                preferredCountries: ["in", "us", "gb"]
+            });
+        }
+    });
+</script>
+{% endblock %}
+```

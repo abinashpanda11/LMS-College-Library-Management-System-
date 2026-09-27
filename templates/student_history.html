@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block header %}Borrowing History{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="no-scrollbar overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 text-slate-600 text-sm uppercase tracking-wider">
+                    <th class="px-6 py-4 font-semibold">Book Title</th>
+                    <th class="px-6 py-4 font-semibold">Author</th>
+                    <th class="px-6 py-4 font-semibold">Issue Date</th>
+                    <th class="px-6 py-4 font-semibold">Returned Date</th>
+                    <th class="px-6 py-4 font-semibold text-center">Fine</th>
+                    <th class="px-6 py-4 font-semibold text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700 text-sm">
+                {% for t in history %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-slate-800">{{ t.book.title }}</td>
+                    <td class="px-6 py-4 text-slate-600">{{ t.book.author }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ t.issue_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ t.return_date.strftime('%Y-%m-%d') if t.return_date else '-' }}
+                    </td>
+                    <td
+                        class="px-6 py-4 text-center font-mono font-bold {{ 'text-red-600' if t.penalty > 0 else 'text-slate-300' }}">
+                        {{ '₹' ~ t.penalty if t.penalty > 0 else '-' }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        {% if t.status == 'returned' %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            RETURNED
+                        </span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            ISSUED
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                        You haven't borrowed any books yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

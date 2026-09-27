@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block header %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Books Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex items-center">
+            <div class="p-4 rounded-full bg-blue-100 text-blue-600">
+                <i class="fas fa-book text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-slate-500">Total Books</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ total_books }}</h3>
+            </div>
+        </div>
+
+        <!-- Active Loans Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex items-center">
+            <div class="p-4 rounded-full bg-yellow-100 text-yellow-600">
+                <i class="fas fa-hand-holding-open text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-slate-500">Active Loans</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ active_loans }}</h3>
+            </div>
+        </div>
+
+        <!-- Overdue Card -->
+        <a href="{{ url_for('admin_transactions', filter='overdue') }}" class="block">
+            <div
+                class="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex items-center hover:shadow-md transition-shadow cursor-pointer">
+                <div class="p-4 rounded-full bg-red-100 text-red-600">
+                    <i class="fas fa-exclamation-circle text-2xl"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <p class="text-sm font-medium text-slate-500">Overdue Returns</p>
+                    <div class="flex items-baseline justify-between">
+                        <h3 class="text-2xl font-bold text-slate-800">{{ overdue }}</h3>
+                        <span class="text-xs font-medium text-blue-600 hover:underline">View Details <i
+                                class="fas fa-arrow-right ml-1"></i></span>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <!-- Total Penalty Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-100 flex items-center">
+            <div class="p-4 rounded-full bg-orange-100 text-orange-600">
+                <i class="fas fa-money-bill-wave text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-slate-500">Outstanding Fines</p>
+                <h3 class="text-2xl font-bold text-slate-800">₹{{ total_penalty }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100">
+            <h3 class="text-lg font-semibold text-slate-800">Recent Transactions</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-600 text-sm uppercase tracking-wider">
+                        <th class="px-6 py-3 font-semibold">Student</th>
+                        <th class="px-6 py-3 font-semibold">Book</th>
+                        <th class="px-6 py-3 font-semibold">Issue Date</th>
+                        <th class="px-6 py-3 font-semibold">Due Date</th>
+                        <th class="px-6 py-3 font-semibold">Penalty</th>
+                        <th class="px-6 py-3 font-semibold">Status</th>
+                        <th class="px-6 py-3 font-semibold text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-sm">
+                    {% for t in recent_transactions %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-medium">{{ t.user.username }}</td>
+                        <td class="px-6 py-4">{{ t.book.title }}</td>
+                        <td class="px-6 py-4">{{ t.issue_date.strftime('%Y-%m-%d') }}</td>
+                        <td
+                            class="px-6 py-4 {{ 'text-red-600' if t.due_date < t.issue_date.utcnow() and t.status == 'issued' }}">
+                            {{ t.due_date.strftime('%Y-%m-%d') }}
+                        </td>
+                        <td
+                            class="px-6 py-4 font-mono font-bold {{ 'text-red-600' if t.penalty > 0 else 'text-slate-400' }}">
+                            {{ '₹' ~ t.penalty if t.penalty > 0 else '-' }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                {{ 'bg-red-100 text-red-800' if t.status == 'returned' else 'bg-green-100 text-green-800' }}">
+                                {{ t.status|upper }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if t.status == 'issued' %}
+                            <form action="{{ url_for('return_book_transaction', transaction_id=t.id) }}" method="POST"
+                                class="inline">
+                                <button type="submit"
+                                    class="text-blue-600 hover:text-blue-900 font-medium">Return</button>
+                            </form>
+                            {% else %}
+                            <span class="text-slate-400">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                            No transactions found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

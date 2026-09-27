@@ -9,7 +9,11 @@ class Config:
     
     # Database
     # This prioritizes the environment variable (External DB) over the local file
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///library.db')
+    _db_uri = os.getenv('SQLALCHEMY_DATABASE_URI', 'sqlite:///library.db')
+    # Auto-fix: ensure SQLAlchemy uses psycopg2 driver (not psycopg v3) for PostgreSQL
+    if _db_uri.startswith('postgresql://'):
+        _db_uri = _db_uri.replace('postgresql://', 'postgresql+psycopg2://', 1)
+    SQLALCHEMY_DATABASE_URI = _db_uri
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Uploads

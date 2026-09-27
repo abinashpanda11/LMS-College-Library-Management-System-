@@ -939,9 +939,9 @@ def init_db():
     except Exception as e:
         print(f"Error initializing database: {e}")
 
-
+# Initialize DB on import (needed for Vercel which imports this module)
+with app.app_context():
+    init_db()
 
 if __name__ == '__main__':
-    with app.app_context():
-        init_db()
     app.run(debug=True)

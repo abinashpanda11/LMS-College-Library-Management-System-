@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block header %}Books Inventory{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Add Book & Issue Book Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Add Book Form -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg mr-3">
+                    <i class="fas fa-plus"></i>
+                </div>
+                Add New Book
+            </h3>
+            <form action="{{ url_for('manage_books') }}" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="add">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Title</label>
+                        <input type="text" name="title" required
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="Book Title">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Author</label>
+                        <input type="text" name="author" required
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="Author Name">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">ISBN</label>
+                        <input type="text" name="isbn" required
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="ISBN">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Category</label>
+                        <input type="text" name="category"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="Genre">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Qty</label>
+                        <input type="number" name="quantity" required min="1" value="1"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors shadow-md">Add
+                    Book</button>
+            </form>
+        </div>
+
+        <!-- Issue Book Form -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                <div class="p-2 bg-green-100 text-green-600 rounded-lg mr-3">
+                    <i class="fas fa-share"></i>
+                </div>
+                Issue Book
+            </h3>
+            <form action="{{ url_for('issue_book') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Student Username</label>
+                    <input type="text" name="student_username" required
+                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                        placeholder="Enter student username">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Book ID</label>
+                        <input type="number" name="book_id" required
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            placeholder="Enter ID from table">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 uppercase mb-1">Days</label>
+                        <select name="days"
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            <option value="7">7 Days</option>
+                            <option value="14" selected>14 Days</option>
+                            <option value="30">30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition-colors shadow-md">Issue
+                    Book</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-lg font-semibold text-slate-800">Inventory Management</h3>
+            <div class="flex gap-2">
+                <a href="{{ url_for('import_books') }}"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    <i class="fas fa-file-excel mr-2"></i> Import Excel
+                </a>
+                <button onclick="document.getElementById('addBookModal').classList.remove('hidden')"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    <i class="fas fa-plus mr-2"></i> Add Book
+                </button>
+                <a href="{{ url_for('bulk_delete_books') }}"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    <i class="fas fa-trash-alt mr-2"></i> Bulk Delete
+                </a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-600 text-sm uppercase tracking-wider">
+                        <th class="px-6 py-3 font-semibold w-16">ID</th>
+                        <th class="px-6 py-3 font-semibold">Title</th>
+                        <th class="px-6 py-3 font-semibold">Author</th>
+                        <th class="px-6 py-3 font-semibold">ISBN</th>
+                        <th class="px-6 py-3 font-semibold text-center">Avail / Total</th>
+                        <th class="px-6 py-3 font-semibold text-center">Misplaced</th>
+                        <th class="px-6 py-3 font-semibold text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700">
+                    {% for book in books %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-mono text-slate-500 text-xs">#{{ book.id }}</td>
+                        <td class="px-6 py-4 font-medium">{{ book.title }}</td>
+                        <td class="px-6 py-4">{{ book.author }}</td>
+                        <td class="px-6 py-4 text-slate-500 text-sm">{{ book.isbn }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="font-bold {{ 'text-green-600' if book.available > 0 else 'text-red-500' }}">
+                                {{ book.available }}
+                            </span>
+                            <span class="text-slate-400">/ {{ book.quantity }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center text-orange-500 font-medium">
+                            {{ book.misplaced if book.misplaced > 0 else '-' }}
+                        </td>
+                        <td class="px-6 py-4 flex justify-end gap-3">
+                            <!-- Restoration Action (Found) -->
+                            {% if book.misplaced > 0 %}
+                            <form action="{{ url_for('report_misplaced', book_id=book.id) }}" method="POST"
+                                class="inline" title="Restore to Inventory (Found)">
+                                <input type="hidden" name="action" value="found">
+                                <input type="hidden" name="count" value="1">
+                                <button type="submit"
+                                    class="text-green-500 hover:text-green-700 bg-green-50 p-1.5 rounded hover:bg-green-100 transition-colors">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Report Misplaced Trigger -->
+                            <button
+                                onclick="openMisplacedModal('{{ book.id }}', '{{ book.title }}', {{ book.available }})"
+                                class="text-orange-500 hover:text-orange-700 p-1.5 rounded hover:bg-orange-50 transition-colors"
+                                title="Report Misplaced/Lost">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+
+                            <!-- Issue Book -->
+                            <button onclick="openIssueModal('{{ book.id }}', '{{ book.title }}')"
+                                class="text-blue-600 hover:text-blue-900 font-medium text-sm">
+                                Issue
+                            </button>
+
+                            <!-- Delete Book -->
+                            <form action="{{ url_for('manage_books') }}" method="POST" class="inline"
+                                onsubmit="return confirm('Delete this book?')">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="book_id" value="{{ book.id }}">
+                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                            No books in inventory. Add one above.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Misplaced Book Modal -->
+<div id="misplacedModal"
+    class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 overflow-hidden transform transition-all">
+        <div class="px-6 py-4 border-b border-slate-100 bg-orange-50 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-orange-800">Report Misplaced Book</h3>
+            <button onclick="document.getElementById('misplacedModal').classList.add('hidden')"
+                class="text-orange-400 hover:text-orange-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form id="misplacedForm" action="" method="POST" class="p-6 space-y-4">
+            <input type="hidden" name="action" value="report">
+
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-2">
+                <p class="text-sm text-blue-800"><span class="font-bold" id="misplacedBookTitle">Title</span></p>
+                <p class="text-xs text-blue-600 mt-1">Available Copies: <span id="misplacedAvailable"
+                        class="font-mono font-bold">0</span></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Copies Misplaced</label>
+                <input type="number" name="count" id="misplacedCount" required min="1" max="1" value="1"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-lg font-bold text-center text-orange-600">
+                <p class="text-xs text-slate-500 mt-1 italic">This will remove them from "Available" stock.</p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="document.getElementById('misplacedModal').classList.add('hidden')"
+                    class="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 font-medium transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-bold shadow-sm transition-colors">
+                    Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openIssueModal(id, title) {
+        document.querySelector('input[name="book_id"]').value = id;
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openMisplacedModal(id, title, available) {
+        document.getElementById('misplacedModal').classList.remove('hidden');
+        document.getElementById('misplacedBookTitle').textContent = title;
+        document.getElementById('misplacedAvailable').textContent = available;
+
+        const countInput = document.getElementById('misplacedCount');
+        countInput.max = available;
+        countInput.value = 1;
+
+        const form = document.getElementById('misplacedForm');
+        form.action = "/admin/book/misplaced/" + id;
+    }
+</script>
+{% endblock %}

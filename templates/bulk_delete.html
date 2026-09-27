@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block header %}Bulk Delete Books{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-red-50">
+            <h3 class="font-bold text-red-800">Bulk Delete via Excel</h3>
+        </div>
+
+        <div class="p-8">
+            <div class="mb-8 p-4 bg-red-50 rounded-lg border border-red-200 text-sm text-red-600">
+                <p class="font-bold mb-2 uppercase"><i class="fas fa-exclamation-triangle mr-2"></i> Warning:
+                    Irreversible Action</p>
+                <p>Books listed in the uploaded Excel will be <strong>permanently deleted</strong> from the database.
+                </p>
+                <p class="mt-2">Excel Requirements:</p>
+                <ul class="list-disc list-inside ml-2">
+                    <li>Required Column: <strong>Title</strong></li>
+                </ul>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Select Excel File</label>
+                    <input type="file" name="file" accept=".xlsx" required class="block w-full text-sm text-slate-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-red-50 file:text-red-700
+                        hover:file:bg-red-100
+                        cursor-pointer border border-slate-300 rounded-lg p-2
+                    " />
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-sm">
+                        <i class="fas fa-trash-alt mr-2"></i> Delete Books
+                    </button>
+                    <a href="{{ url_for('manage_books') }}"
+                        class="text-slate-500 hover:text-slate-800 font-medium">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block header %}Payment Records{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase text-slate-500">
+                    <th class="px-6 py-4 font-semibold">Transaction ID</th>
+                    <th class="px-6 py-4 font-semibold">Student</th>
+                    <th class="px-6 py-4 font-semibold">Book</th>
+                    <th class="px-6 py-4 font-semibold">Amount</th>
+                    <th class="px-6 py-4 font-semibold">Returned Date</th>
+                    <th class="px-6 py-4 font-semibold text-right">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700 text-sm">
+                {% for p in payments %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-mono font-bold text-slate-600">{{ p.payment_id }}</td>
+                    <td class="px-6 py-4 font-medium">
+                        {{ p.user.username }}
+                        <span class="text-xs text-slate-400 block">{{ p.user.registration_number }}</span>
+                    </td>
+                    <td class="px-6 py-4">{{ p.book.title }}</td>
+                    <td class="px-6 py-4 font-bold text-green-600">₹{{ p.penalty }}</td>
+                    <td class="px-6 py-4 text-slate-500">{{ p.return_date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Verified <i class="fas fa-check-circle ml-1"></i>
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                        No payment records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
